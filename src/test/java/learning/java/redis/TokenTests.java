@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.xml.bind.SchemaOutputResolver;
@@ -28,7 +29,7 @@ public class TokenTests {
      */
     @Test
     public void contextLoads() {
-        createRandomUserAndToken();
+        cleanToken();
     }
 
     private void saveUserByToken(String token, String userId){
@@ -45,7 +46,8 @@ public class TokenTests {
 
     private void cleanToken(){
         // 升序获取所有在范围内的key
-        Set<String> keys = srt.opsForZSet().range("zset-key", 0, 2);
+        ZSetOperations<String, String> ops = srt.opsForZSet();
+        Set<String> keys = ops.range("recent:", 0, 100);
         keys.forEach((key) -> {
             System.out.println(key);
         });
